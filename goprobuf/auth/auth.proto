@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth;
 
-option go_package = "github.com/JiagnNan/apd_New/goprobuf/auth/authpb;authpb";
+option go_package = "github.com/JiagnNan/apd_New/server/rpc/auth/authpb";
 
 message NumberLoginReq {
   string number = 1;
