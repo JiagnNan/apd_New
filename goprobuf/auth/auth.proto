@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/JiagnNan/apd_New/goprobuf/auth/authpb;authpb";
+
+message NumberLoginReq {
+  string number = 1;
+  string code = 2;
+}
+
+message RegisterReq {
+  string number = 1;
+  string code = 2;
+}
+
+message SendCodeReq {
+  string number = 1;
+  string codeType = 2;
+}
+
+message SendCodeResp {
+  string phoneCode = 1;
+  string sentType = 2;
+  string codeType = 3;
+  string nextType = 4;
+  int64  timeOut = 5;
+  int64 expiresAt = 6;
+}
+
+message TokenResp {
+  string accessToken = 1;
+  string refreshToken = 2;
+  int64 accessTokenExpireAt = 3;
+  int64 refreshTokenExpireAt = 4;
+  string jti = 5;
+}
+
+service auth {
+  rpc NumberLogin(NumberLoginReq) returns (TokenResp);
+  rpc Register(RegisterReq) returns (TokenResp);
+  rpc SendCode(SendCodeReq) returns (SendCodeResp);
+}

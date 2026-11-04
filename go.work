@@ -1,0 +1,9 @@
+go 1.25.9
+
+use (
+	./api-gateway
+	./commonlib
+	./goprobuf
+	./grpcclient
+	./server
+)

@@ -1,0 +1,49 @@
+syntax = "v1"
+
+type NumberLoginReq{
+    Number string `json:"number"`
+    Code    string     `json:"code"`
+}
+type RegisterReq {
+    Number string `json:"number"`
+    Code    string     `json:"code"`
+}
+//"验证码发送场景:1-登录,2-注册"
+type SendCodeReq {
+    Number string `json:"number"`
+    CodeType    string    `json:"codeType"`
+}
+// SendCodeResp 表示验证码发送结果。
+type SendCodeResp {
+    PhoneCode string `json:"phoneCode"` // 验证码，开发或应用内验证码场景返回
+    SentType  string `json:"sentType"`  // 本次发送类型：sms/email/app
+    CodeType    string    `json:"codeType"`//发送场景
+    NextType  string `json:"nextType"`  // 下次建议发送类型
+    Timeout   int64  `json:"timeout"`   // 再次发送等待时间，单位秒
+    ExpiresAt int64  `json:"expiresAt"` // 验证码过期时间，Unix 秒
+}
+
+// TokenResp 表示登录、注册或刷新后的 Token 信息。
+type TokenResp {
+    AccessToken          string `json:"accessToken"`          // 访问 Token
+    RefreshToken         string `json:"refreshToken"`         // 刷新 Token
+    AccessTokenExpireAt  int64  `json:"accessTokenExpireAt"`  // 访问 Token 过期时间，Unix 秒
+    RefreshTokenExpireAt int64  `json:"refreshTokenExpireAt"` // 刷新 Token 过期时间，Unix 秒
+    Jti                  string `json:"jti"`                  // Token 唯一标识，用于退出登录和黑名单
+}
+
+@server (
+    group: auth
+    prefix: /api/v1/auth
+)
+service main-api {
+    @handler NumberLogin
+    post /login (NumberLoginReq) returns (TokenResp)
+
+    @handler Register
+    post /register (RegisterReq) returns (TokenResp)
+
+    @handler SendCode
+    post /sendCode (SendCodeReq) returns (SendCodeResp)
+}
+

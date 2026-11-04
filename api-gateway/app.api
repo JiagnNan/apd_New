@@ -1,0 +1,5 @@
+syntax = "v1"
+
+import "docs/main/auth.api"
+
+//import "docs/main/accout.api"
