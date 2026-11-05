@@ -56,6 +56,10 @@ func FromError(err error) (*RpcError, bool) {
 
 	var rpcErr *RpcError
 	if errors.As(err, &rpcErr) {
+		//rpcErr可能是空指针
+		if rpcErr == nil {
+			return ERR_SERVER_INTERNAL, true
+		}
 		return rpcErr, true
 	}
 

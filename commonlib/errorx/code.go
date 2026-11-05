@@ -4,7 +4,7 @@ import "net/http"
 
 const (
 	// OK 表示业务处理成功。
-	OK int32 = 0
+	OK int32 = 200
 )
 
 // 系统错误使用 500xxx 码段。

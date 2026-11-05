@@ -33,9 +33,11 @@ func ToGRPC(err error) error {
 	}
 
 	if st, ok := status.FromError(err); ok {
-		if _, structured := fromGRPCDetails(st); structured {
-			return err
+		rpcErr, found := FromError(err)
+		if !found || rpcErr == nil {
+			rpcErr = ERR_SERVER_INTERNAL
 		}
+		return grpcErrorWithCode(rpcErr, st.Code())
 	}
 
 	if rpcErr, ok := FromError(err); ok {
@@ -48,14 +50,11 @@ func ToGRPC(err error) error {
 		return grpcError(ERR_REQUEST_TIMEOUT)
 	}
 
-	if st, ok := status.FromError(err); ok {
-		return grpcError(errorFromGRPCCode(st.Code()))
-	}
 	return grpcError(ERR_SERVER_INTERNAL)
 }
 
 // grpcError 把业务错误写入标准 ErrorInfo，避免依赖 gRPC message 反推业务码。
-func grpcError(rpcErr *RpcError) error {
+func grpcErrorWithCode(rpcErr *RpcError, grpcCode codes.Code) error {
 	info := &errdetails.ErrorInfo{
 		Reason: rpcErr.MessageKey,
 		Domain: errorDomain,
@@ -65,12 +64,16 @@ func grpcError(rpcErr *RpcError) error {
 		},
 	}
 
-	st := status.New(grpcCodeFromHTTPStatus(rpcErr.HTTPStatus()), rpcErr.MessageKey)
+	st := status.New(grpcCode, rpcErr.MessageKey)
 	withDetails, err := st.WithDetails(info)
 	if err != nil {
 		return status.Error(codes.Internal, ERR_SERVER_INTERNAL.MessageKey)
 	}
 	return withDetails.Err()
+}
+func grpcError(rpcErr *RpcError) error {
+	grpcCode := grpcCodeFromHTTPStatus(rpcErr.HTTPStatus())
+	return grpcErrorWithCode(rpcErr, grpcCode)
 }
 
 // grpcCodeFromHTTPStatus 保留 gRPC 语义，同时让 HTTP 状态由 ErrorInfo 独立传递。
