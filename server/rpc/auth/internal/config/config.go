@@ -1,7 +1,29 @@
 package config
 
-import "github.com/zeromicro/go-zero/zrpc"
+import (
+	"github.com/JiagnNan/apd_New/commonlib/dbx"
+	"github.com/JiagnNan/apd_New/commonlib/pkg/log"
+	"github.com/JiagnNan/apd_New/commonlib/redisx"
+	"github.com/zeromicro/go-zero/zrpc"
+)
 
 type Config struct {
 	zrpc.RpcServerConf
+	mysqlConf dbx.Config
+	redisConf redisx.Config
+	AuthKey   AuthKeyConf
+	PhoneCode PhoneCodeConf
+	AppLog    log.Config `json:"AppLog,optional"`
+}
+
+type AuthKeyConf struct {
+	AccessSecret  string `json:",optional"`
+	AccessExpire  int64
+	RefreshSecret string `json:",optional"`
+	RefreshExpire int64
+}
+
+type PhoneCodeConf struct {
+	Expire         int64
+	ResendInterval int64
 }

@@ -27,7 +27,6 @@ func NewSendCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendCode
 }
 
 func (l *SendCodeLogic) SendCode(req *types.SendCodeReq) (resp *types.SendCodeResp, err error) {
-	// todo: add your logic here and delete this line
-
+		l.svcCtx.
 	return
 }

@@ -87,9 +87,10 @@ func FromMessage(messageKey string) (*RpcError, bool) {
 	return rpcErr, ok
 }
 
-// fromGRPCDetails 从标准 ErrorInfo 中读取 HTTP 状态和业务错误码。
+// fromGRPCDetails 从标准 Error 中读取 HTTP 状态和业务错误码。
 func fromGRPCDetails(st *status.Status) (*RpcError, bool) {
 	for _, detail := range st.Details() {
+		//类型断言：检查这条详情是否为 ErrorInfo
 		info, ok := detail.(*errdetails.ErrorInfo)
 		if !ok || info.Domain != errorDomain {
 			continue

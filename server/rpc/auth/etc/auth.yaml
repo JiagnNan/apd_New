@@ -4,3 +4,34 @@ Etcd:
   Hosts:
   - 127.0.0.1:2379
   Key: auth.rpc
+
+
+Mysql:
+  DataSource: root:root@tcp(127.0.0.1:3306)/apd?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+  MaxIdleConn: 10
+  MaxOpenConn: 100
+  MaxLifetime: 600
+  SlowThreshold: 200
+
+RedisConf:
+  - Host: 127.0.0.1:6381
+    Type: node
+    Pass: ""
+    DB: 0
+    PoolSize: 20
+    MinIdleConns: 5
+
+AuthKey:
+  AccessSecret: ""
+  AccessExpire: 3600
+  RefreshSecret: ""
+  RefreshExpire: 7200
+
+PhoneCode:
+  Expire: 600
+  ResendInterval: 60
+
+AppLog:
+  level: "debug"
+  encoding: "console"
+  stacktrace: "false"
