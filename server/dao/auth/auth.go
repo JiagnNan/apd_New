@@ -1,4 +1,4 @@
-package dao
+package auth
 
 import (
 	model "github.com/JiagnNan/apd_New/server/model/auth"
