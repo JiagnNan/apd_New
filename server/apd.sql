@@ -18,6 +18,12 @@ create table user_info(
     unique key `udx_username` (`username`)
 )default char set = `utf8mb4` comment '用户详情表';
 
+ALTER TABLE user_info
+ADD COLUMN phone varchar(20)  DEFAULT NULL,
+add column email varchar(128) default null,
+ADD UNIQUE INDEX uk_user_active_phone ((CASE WHEN is_logoff = 0 THEN phone ELSE NULL END)),
+ADD UNIQUE INDEX uk_user_active_email ((CASE WHEN is_logoff = 0 THEN email ELSE NULL END));
+
 create table register_info(
     id bigint primary key auto_increment comment '自增id',
     user_id bigint not null default 0 comment '用户id',
