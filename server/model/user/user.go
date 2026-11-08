@@ -5,6 +5,8 @@ import "time"
 type UserInfo struct {
 	Id          int64     `gorm:"column:id;primaryKey;autoIncrement"`
 	Code        string    `gorm:"column:code;"`
+	Phone       string    `gorm:"column:phone;"`
+	Email       string    `gorm:"column:email;"`
 	Birthday    time.Time `gorm:"column:birthday;"`
 	Gender      uint8     `gorm:"column:gender;"`
 	Nickname    string    `gorm:"column:nickname;"`
