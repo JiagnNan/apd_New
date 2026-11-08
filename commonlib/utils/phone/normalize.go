@@ -4,8 +4,9 @@ import (
 	"github.com/JiagnNan/apd_New/commonlib/errorx"
 	"strings"
 )
+
 // 规范化手机号输入，去掉空格、短横线和加号。
-func normalize(phoneNumber string) string {
+func Normalize(phoneNumber string) string {
 	phoneNumber = strings.TrimSpace(phoneNumber)
 	phoneNumber = strings.ReplaceAll(phoneNumber, " ", "")
 	phoneNumber = strings.ReplaceAll(phoneNumber, "-", "")
@@ -14,7 +15,7 @@ func normalize(phoneNumber string) string {
 }
 
 // 规范化登录账号，邮箱直接返回，手机号解析后返回真实号码。
-func normalizeAccount(account string) (string, error) {
+func NormalizeAccount(account string) (string, error) {
 	if account == "" {
 		return "", errorx.ERR_PARAM_INVALID
 	}
