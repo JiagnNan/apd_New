@@ -21,3 +21,15 @@ type UserInfo struct {
 func (UserInfo) TableName() string {
 	return "user_info"
 }
+
+type RegisterInfo struct {
+	Id     int64  `gorm:"column:id;primaryKey;autoIncrement"`
+	UserId int64  `gorm:"column:user_id;"`
+	Phone  string `gorm:"column:phone;"`
+	Email  string `gorm:"column:email;"`
+	Status uint8  `gorm:"column:status;"`
+}
+
+func (RegisterInfo) TableName() string {
+	return "register_info"
+}
