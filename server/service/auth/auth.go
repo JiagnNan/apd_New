@@ -1,4 +1,4 @@
-package service
+package auth
 
 import (
 	"github.com/JiagnNan/apd_New/commonlib/errorx"
