@@ -9,8 +9,8 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
-	mysqlConf dbx.Config
-	redisConf redisx.Config
+	MysqlConf dbx.Config
+	RedisConf redisx.Config
 	AuthKey   AuthKeyConf
 	PhoneCode PhoneCodeConf
 	AppLog    log.Config `json:"AppLog,optional"`
