@@ -29,4 +29,7 @@ func (d *UserDao) GetUserIdByPhoneOrEmail(ctx context.Context, phoneNumber strin
 	} else {
 		query = query.Where("email = ?", phoneNumber)
 	}
+	err := query.First(&v).Error
+
+	return &v, err
 }
