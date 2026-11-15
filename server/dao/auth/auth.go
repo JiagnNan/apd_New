@@ -20,7 +20,7 @@ func (d *AuthDao) DB(ctx context.Context) *gorm.DB {
 	return d.db.WithContext(ctx)
 }
 
-func (d *AuthDao) GetAuthCode(ctx context.Context, phoneNumber string, codeType uint8) (*model.AuthCode, error) {
+func (d *AuthDao) GetAuthCode(ctx context.Context, phoneNumber string, codeType model.CodeType) (*model.AuthCode, error) {
 	var v model.AuthCode
 	err := d.DB(ctx).
 		Where("phone_number = ?", phoneNumber).
@@ -31,10 +31,14 @@ func (d *AuthDao) GetAuthCode(ctx context.Context, phoneNumber string, codeType 
 func (d *AuthDao) SaveAuthCode(ctx context.Context, authCode *model.AuthCode) error {
 	return d.DB(ctx).Save(authCode).Error
 }
-func (d *AuthDao) DeleteAuthCode(ctx context.Context, phoneNumber string, codeType uint8) error {
+func (d *AuthDao) DeleteAuthCode(ctx context.Context, phoneNumber string, codeType model.CodeType) error {
 	err := d.DB(ctx).Table("auth_code").
 		Where("phone_number = ? and deleted = 0", phoneNumber).
 		Where("code_type = ?", codeType).
 		Update("deleted", 1).Error
 	return err
+}
+
+func (d *AuthDao) Login(ctx context.Context, authLogin model.AuthLogin) error {
+	return d.DB(ctx).Create(&authLogin).Error
 }
