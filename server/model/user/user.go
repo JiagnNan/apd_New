@@ -18,6 +18,7 @@ type UserInfo struct {
 	BlackTime   int64     `gorm:"column:black_time;"`
 	WealthLevel int       `gorm:"column:wealth_level;"`
 	CharmLevel  int       `gorm:"column:charm_level;"`
+	AuthVersion string    `gorm:"column:auth_version;"`
 }
 
 func (UserInfo) TableName() string {

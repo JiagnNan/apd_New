@@ -9,7 +9,7 @@ import (
 var ErrPhoneNumberInvalid = errors.New("phone number invalid")
 
 func parsePhone(phoneNumber string) (*Country, string, error) {
-	phoneNumber = normalize(phoneNumber)
+	phoneNumber = Normalize(phoneNumber)
 	if !IsAllDigits(phoneNumber) {
 		return nil, "", ErrPhoneNumberInvalid
 	}

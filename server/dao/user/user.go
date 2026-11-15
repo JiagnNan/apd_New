@@ -25,9 +25,9 @@ func (d *UserDao) GetUserIdByPhoneOrEmail(ctx context.Context, phoneNumber strin
 	var v model.UserInfo
 	query := d.DB(ctx)
 	if strings.Contains(phoneNumber, "@") {
-		query = query.Where("phone = ?", phoneNumber)
-	} else {
 		query = query.Where("email = ?", phoneNumber)
+	} else {
+		query = query.Where("phone = ?", phoneNumber)
 	}
 	err := query.First(&v).Error
 

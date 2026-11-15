@@ -39,6 +39,6 @@ func (d *AuthDao) DeleteAuthCode(ctx context.Context, phoneNumber string, codeTy
 	return err
 }
 
-func (d *AuthDao) Login(ctx context.Context, authLogin model.AuthLogin) error {
+func (d *AuthDao) Login(ctx context.Context, authLogin *model.AuthLogin) error {
 	return d.DB(ctx).Create(&authLogin).Error
 }
