@@ -1,4 +1,10 @@
 Name: auth.rpc
+# Tencent IM configuration. Supply APD_IM_SECRET_KEY through the environment.
+# IM:
+#   Enabled: true
+#   SDKAppID: 0
+#   AdminUser: administrator
+#   Region: cn
 ListenOn: 0.0.0.0:8080
 Etcd:
   Hosts:

@@ -4,6 +4,7 @@ import (
 	"github.com/JiagnNan/apd_New/commonlib/dbx"
 	"github.com/JiagnNan/apd_New/commonlib/pkg/log"
 	"github.com/JiagnNan/apd_New/commonlib/redisx"
+	"github.com/JiagnNan/apd_New/server/service/im"
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
@@ -14,6 +15,7 @@ type Config struct {
 	AuthKey   AuthKeyConf
 	PhoneCode PhoneCodeConf
 	AppLog    log.Config `json:"AppLog,optional"`
+	IM        im.Config  `json:",optional"`
 }
 
 type AuthKeyConf struct {

@@ -37,3 +37,7 @@ func (s *AuthServer) SendCode(ctx context.Context, in *authpb.SendCodeReq) (*aut
 	l := logic.NewSendCodeLogic(ctx, s.svcCtx)
 	return l.SendCode(in)
 }
+
+func (s *AuthServer) RefreshImUserSig(ctx context.Context, in *authpb.ImUserSigReq) (*authpb.ImUserSigResp, error) {
+	return logic.NewRefreshImUserSigLogic(ctx, s.svcCtx).RefreshImUserSig(in)
+}

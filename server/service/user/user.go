@@ -25,7 +25,7 @@ func (svc *UserSvc) GetUserIdByPhoneOrEmail(ctx context.Context, phoneNumber str
 		}
 		return nil, errorx.ERR_SERVER_INTERNAL
 	}
-	if user.IsLogoff == 1 || user.BlackTime != 1 {
+	if user.IsLogoff != 0 || user.BlackTime != 0 {
 		return nil, errorx.ERR_USER_STATUS_ABNORMAL
 	}
 	return user, nil

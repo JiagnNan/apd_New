@@ -1,3 +1,9 @@
 Name: main-api
 Host: 0.0.0.0
 Port: 8888
+
+# Optional RPC connection for POST /api/v1/im/userSig/refresh.
+# IMAuthRPC:
+#   Endpoints:
+#     - 127.0.0.1:8080
+#   Timeout: 4000

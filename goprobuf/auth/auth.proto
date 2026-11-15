@@ -36,8 +36,18 @@ message TokenResp {
   string jti = 5;
 }
 
+message ImUserSigReq {}
+
+message ImUserSigResp {
+  int64 sdkAppId = 1;
+  string userId = 2;
+  string userSig = 3;
+  int64 expiresAt = 4;
+}
+
 service auth {
   rpc NumberLogin(NumberLoginReq) returns (TokenResp);
   rpc Register(RegisterReq) returns (TokenResp);
   rpc SendCode(SendCodeReq) returns (SendCodeResp);
+  rpc RefreshImUserSig(ImUserSigReq) returns (ImUserSigResp);
 }

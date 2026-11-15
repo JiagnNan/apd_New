@@ -9,5 +9,6 @@ type AuthCodeRepository interface {
 	GetAuthCode(ctx context.Context, phoneNumber string, codeType model.CodeType) (*model.AuthCode, error)
 	SaveAuthCode(ctx context.Context, authCode *model.AuthCode) error
 	DeleteAuthCode(ctx context.Context, phoneNumber string, codeType model.CodeType) error
+	ConsumeAuthCode(ctx context.Context, code *model.AuthCode) bool
 	Login(ctx context.Context, authLogin *model.AuthLogin) error
 }

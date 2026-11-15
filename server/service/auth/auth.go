@@ -50,6 +50,12 @@ func (s *AuthSvc) DeletedAuthCode(ctx context.Context, phoneNumber string, codeT
 	}
 	return nil
 }
+func (s *AuthSvc) ConsumeAuthCode(ctx context.Context, code *model.AuthCode) error {
+	if ok := s.userDao.ConsumeAuthCode(ctx, code); ok {
+		return nil
+	}
+	return errorx.ERR_PHONE_CODE_INVALID
+}
 
 func (s *AuthSvc) Login(ctx context.Context, userId int64, actionType model.ActionType, loginType model.LoginType) error {
 	var v *model.AuthLogin
@@ -63,7 +69,7 @@ func (s *AuthSvc) Login(ctx context.Context, userId int64, actionType model.Acti
 		DeviceModel:   md.DeviceModel,
 		SystemVersion: md.SystemVersion,
 		AppVersion:    md.AppVersion,
-		Platform:      md.LangPack,
+		Platform:      md.Platform,
 		Language:      "en",
 		LoginType:     uint8(loginType),
 		ActionType:    uint8(actionType),

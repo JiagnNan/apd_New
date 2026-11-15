@@ -15,7 +15,7 @@ type UserInfo struct {
 	IsLogoff    uint8     `gorm:"column:is_logoff;"`
 	IsAuth      uint8     `gorm:"column:is_auth;"`
 	LogoffTime  int64     `gorm:"column:logoff_time;"`
-	BlackTime   int64     `gorm:"column:black_time;"`
+	BlackTime   int64     `gorm:"column:black_time;"` // 被封禁的时间戳；0 表示正常，解封时清零，不自动到期。
 	WealthLevel int       `gorm:"column:wealth_level;"`
 	CharmLevel  int       `gorm:"column:charm_level;"`
 	AuthVersion string    `gorm:"column:auth_version;"`

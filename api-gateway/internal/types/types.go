@@ -3,6 +3,14 @@
 
 package types
 
+type ImUserSigResp struct {
+	ImEnabled         bool   `json:"imEnabled"`
+	ImSdkAppId        int64  `json:"imSdkAppId"`
+	ImUserId          string `json:"imUserId"`
+	ImUserSig         string `json:"imUserSig"`
+	ImUserSigExpireAt int64  `json:"imUserSigExpireAt"`
+}
+
 type NumberLoginReq struct {
 	Number string `json:"number"`
 	Code   string `json:"code"`

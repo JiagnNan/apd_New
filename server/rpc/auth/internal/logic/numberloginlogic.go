@@ -35,7 +35,7 @@ func (l *NumberLoginLogic) NumberLogin(in *authpb.NumberLoginReq) (*authpb.Token
 	if err != nil {
 		return nil, err
 	}
-	_, err = l.svcCtx.AuthSvc.CheckPhoneCode(l.ctx, phoneNumber, in.Code, modelAuth.CodeTypeLogin)
+	checkedCode, err := l.svcCtx.AuthSvc.CheckPhoneCode(l.ctx, phoneNumber, in.Code, modelAuth.CodeTypeLogin)
 	if err != nil {
 		return nil, err
 	}
@@ -54,23 +54,28 @@ func (l *NumberLoginLogic) NumberLogin(in *authpb.NumberLoginReq) (*authpb.Token
 		return nil, errorx.ERR_SERVER_INTERNAL
 	}
 	var t modelAuth.LoginType
-	if strings.Contains("@", phoneNumber) {
+	if strings.Contains(phoneNumber, "@") {
 		t = modelAuth.EmailLoginType
 	} else {
 		t = modelAuth.PhoneLoginType
+	}
+
+	//软删除验证码
+	if err := l.svcCtx.AuthSvc.ConsumeAuthCode(l.ctx, checkedCode); err != nil {
+		return nil, err
 	}
 	err = l.svcCtx.AuthSvc.Login(l.ctx, user.Id, modelAuth.ActionTypeLogin, t)
 	if err != nil {
 		return nil, err
 	}
+
 	pair, err := l.svcCtx.AuthSvc.CreateSession(l.ctx, user.Id, platform, user.AuthVersion)
 	if err != nil {
 		l.Errorf("create login session: %v", err)
 		return nil, errorx.ERR_SERVER_INTERNAL
 	}
 
-	//软删除验证码
-	_ = l.svcCtx.AuthSvc.DeletedAuthCode(l.ctx, phoneNumber, modelAuth.CodeTypeLogin)
+	l.svcCtx.IM.SyncAccountAsync(l.ctx, user.Id)
 	return &authpb.TokenResp{
 		AccessToken:          pair.AccessToken,
 		RefreshToken:         pair.RefreshToken,

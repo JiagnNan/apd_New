@@ -33,4 +33,15 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		},
 		rest.WithPrefix("/api/v1/auth"),
 	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/userSig/refresh",
+				Handler: auth.RefreshImUserSigHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/v1/im"),
+	)
 }

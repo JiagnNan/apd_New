@@ -9,20 +9,30 @@ import (
 	user2 "github.com/JiagnNan/apd_New/server/dao/user"
 	"github.com/JiagnNan/apd_New/server/rpc/auth/internal/config"
 	"github.com/JiagnNan/apd_New/server/service/auth"
+	"github.com/JiagnNan/apd_New/server/service/im"
 	"github.com/JiagnNan/apd_New/server/service/user"
+	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
+	"os"
 	"time"
 )
 
 type ServiceContext struct {
-	Config  config.Config
-	DB      *gorm.DB
-	Redis   *redisx.Client
-	AuthSvc *auth.AuthSvc
-	UserSvc *user.UserSvc
+	Config     config.Config
+	DB         *gorm.DB
+	Redis      *redisx.Client
+	AuthSvc    *auth.AuthSvc
+	UserSvc    *user.UserSvc
+	IM         *im.Service
+	IMSessions *auth2.SessionDao
+	IMTokens   *jwt.Manager
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
+	imService, err := im.New(c.IM, os.Getenv("APD_IM_SECRET_KEY"))
+	if err != nil {
+		logx.Errorf("Tencent IM initialization failed: %v", err)
+	}
 	db := dbx.MustNewMysql(c.MysqlConf)
 	redisClient := redisx.MustNewRedis(c.RedisConf)
 
@@ -36,7 +46,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		fmt.Println("jwt.NewManager 初始化失败")
 		panic(err)
 	}
-	
+
 	authDao := auth2.NewAuthDao(db)
 	sessionDao := auth2.NewSessionDao(redisClient)
 	authSvc := auth.NewAuthSvc(authDao, sessionDao, manager)
@@ -45,10 +55,13 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	userSvc := user.NewUserSvc(userDao)
 
 	return &ServiceContext{
-		Config:  c,
-		DB:      db,
-		Redis:   redisClient,
-		AuthSvc: authSvc,
-		UserSvc: userSvc,
+		Config:     c,
+		DB:         db,
+		Redis:      redisClient,
+		AuthSvc:    authSvc,
+		UserSvc:    userSvc,
+		IM:         imService,
+		IMSessions: sessionDao,
+		IMTokens:   manager,
 	}
 }

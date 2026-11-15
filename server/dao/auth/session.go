@@ -32,6 +32,18 @@ const (
 	sessionKeyFormat = "auth:session:%d:%s"
 )
 
+func (d *SessionDao) GetSession(ctx context.Context, userID int64, platform string) (*Session, error) {
+	raw, err := d.redisClient.Get(ctx, fmt.Sprintf(sessionKeyFormat, userID, platform))
+	if err != nil {
+		return nil, err
+	}
+	var session Session
+	if err := json.Unmarshal([]byte(raw), &session); err != nil {
+		return nil, err
+	}
+	return &session, nil
+}
+
 func (d *SessionDao) SaveSession(ctx context.Context, userId int64, platform string, session Session) error {
 	key := fmt.Sprintf(sessionKeyFormat, userId, platform)
 	t := time.Until(time.Unix(session.RefreshExpireAt, 0))
