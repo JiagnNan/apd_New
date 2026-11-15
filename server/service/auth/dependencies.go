@@ -6,7 +6,7 @@ import (
 )
 
 type AuthCodeRepository interface {
-	GetAuthCode(ctx context.Context, phoneNumber string, codeType uint8) (*model.AuthCode, error)
+	GetAuthCode(ctx context.Context, phoneNumber string, codeType model.CodeType) (*model.AuthCode, error)
 	SaveAuthCode(ctx context.Context, authCode *model.AuthCode) error
-	DeleteAuthCode(ctx context.Context, phoneNumber string, codeType uint8) error
+	DeleteAuthCode(ctx context.Context, phoneNumber string, codeType model.CodeType) error
 }
