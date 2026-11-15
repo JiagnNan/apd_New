@@ -64,6 +64,8 @@ var (
 	ERR_PASSWORD_NOT_SET          = NewRpcError(http.StatusConflict, 100028, "PASSWORD_NOT_SET")
 	ERR_PASSWORD_UNCHANGED        = NewRpcError(http.StatusConflict, 100029, "PASSWORD_UNCHANGED")
 	ERR_USER_NOT_EXISTED          = NewRpcError(http.StatusNotFound, 100030, "USER_NOT_EXISTED")
+	ERR_CREATE_LOGIN_ERROR        = NewRpcError(http.StatusBadRequest, 100040, "CREATE_LOGIN_ERROR")
+	ERR_DELETED_PHONE_CODE_FAILED = NewRpcError(http.StatusBadRequest, 100050, "DELETE_PHONE_CODE_FAILED")
 )
 
 // 联系人错误使用 200xxx 码段。
