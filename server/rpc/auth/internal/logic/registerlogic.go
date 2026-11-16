@@ -2,6 +2,12 @@ package logic
 
 import (
 	"context"
+	"github.com/JiagnNan/apd_New/commonlib/mdata"
+	modelAuth "github.com/JiagnNan/apd_New/server/model/auth"
+	"strings"
+
+	"github.com/JiagnNan/apd_New/commonlib/errorx"
+	utils "github.com/JiagnNan/apd_New/commonlib/utils/phone"
 
 	"github.com/JiagnNan/apd_New/server/rpc/auth/authpb"
 	"github.com/JiagnNan/apd_New/server/rpc/auth/internal/svc"
@@ -24,7 +30,69 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, error) {
-	// todo: add your logic here and delete this line
+	var phoneNumber string
+	var isPhone bool
+	var err error
+	var c *utils.Country
+	if strings.Contains(in.Number, "@") {
+		phoneNumber = in.Number
+		isPhone = false
+	} else {
+		c, phoneNumber, err = utils.ParsePhone(phoneNumber)
+		if err != nil {
+			return nil, errorx.ERR_PARAM_INVALID
+		}
+		isPhone = true
+	}
+	checkedCode, err := l.svcCtx.AuthSvc.CheckPhoneCode(l.ctx, phoneNumber, in.Code, modelAuth.CodeTypeLogin)
+	if err != nil {
+		return nil, err
+	}
 
-	return &authpb.TokenResp{}, nil
+	user, err := l.svcCtx.UserSvc.GetUserIdByPhoneOrEmail(l.ctx, phoneNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	if user != nil {
+		return nil, errorx.ERR_DUPLICATE_REGISTERATION
+	}
+	//软删除验证码
+	if err := l.svcCtx.AuthSvc.ConsumeAuthCode(l.ctx, checkedCode); err != nil {
+		return nil, err
+	}
+
+	md := mdata.FromContext(l.ctx)
+
+	user, err = l.svcCtx.UserSvc.CreateUserInfo(l.ctx, phoneNumber, c.CountryCode, isPhone)
+	if err != nil {
+		return nil, err
+	}
+	var t modelAuth.LoginType
+	if !isPhone {
+		t = modelAuth.EmailLoginType
+	} else {
+		t = modelAuth.PhoneLoginType
+	}
+
+	err = l.svcCtx.AuthSvc.Login(l.ctx, user.Id, modelAuth.ActionTypeRegister, t, user.CountryCode)
+	if err != nil {
+		return nil, err
+	}
+
+	pair, err := l.svcCtx.AuthSvc.CreateSession(l.ctx, user.Id, md.Platform, user.AuthVersion)
+	if err != nil {
+		l.Errorf("create login session: %v", err)
+		return nil, errorx.ERR_SERVER_INTERNAL
+	}
+
+	l.svcCtx.IM.SyncAccountAsync(l.ctx, user.Id)
+
+	return &authpb.TokenResp{
+		AccessToken:          pair.AccessToken,
+		RefreshToken:         pair.RefreshToken,
+		AccessTokenExpireAt:  pair.AccessExpireAt.Unix(),
+		RefreshTokenExpireAt: pair.RefreshExpireAt.Unix(),
+		Jti:                  pair.AccessJTI,
+	}, nil
 }

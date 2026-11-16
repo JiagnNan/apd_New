@@ -2,8 +2,6 @@ package logic
 
 import (
 	"context"
-	"strings"
-
 	"github.com/JiagnNan/apd_New/commonlib/errorx"
 	"github.com/JiagnNan/apd_New/commonlib/mdata"
 	utils "github.com/JiagnNan/apd_New/commonlib/utils/phone"
@@ -30,8 +28,9 @@ func NewNumberLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Numbe
 
 func (l *NumberLoginLogic) NumberLogin(in *authpb.NumberLoginReq) (*authpb.TokenResp, error) {
 	var phoneNumber string
+	var isPhone bool
 	var err error
-	phoneNumber, err = utils.NormalizeAccount(in.Number)
+	phoneNumber, isPhone, err = utils.NormalizeAccount(in.Number)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +53,7 @@ func (l *NumberLoginLogic) NumberLogin(in *authpb.NumberLoginReq) (*authpb.Token
 		return nil, errorx.ERR_SERVER_INTERNAL
 	}
 	var t modelAuth.LoginType
-	if strings.Contains(phoneNumber, "@") {
+	if !isPhone {
 		t = modelAuth.EmailLoginType
 	} else {
 		t = modelAuth.PhoneLoginType
@@ -64,7 +63,7 @@ func (l *NumberLoginLogic) NumberLogin(in *authpb.NumberLoginReq) (*authpb.Token
 	if err := l.svcCtx.AuthSvc.ConsumeAuthCode(l.ctx, checkedCode); err != nil {
 		return nil, err
 	}
-	err = l.svcCtx.AuthSvc.Login(l.ctx, user.Id, modelAuth.ActionTypeLogin, t)
+	err = l.svcCtx.AuthSvc.Login(l.ctx, user.Id, modelAuth.ActionTypeLogin, t, user.CountryCode)
 	if err != nil {
 		return nil, err
 	}

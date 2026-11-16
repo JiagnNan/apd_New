@@ -25,7 +25,7 @@ type Mdata struct {
 	LangCode       string `json:"langCode"`
 	ClientIp       string `json:"clientIp"`
 	LangPack       string `json:"langPack"`
-	CountryCode    int64  `json:"countryCode"`
+	CountryCode    string `json:"countryCode"`
 	Jti            string `json:"jti"`
 	TokenType      string `json:"tokenType"`
 	TokenHash      string `json:"tokenHash"`

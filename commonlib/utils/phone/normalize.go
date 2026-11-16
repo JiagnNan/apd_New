@@ -23,7 +23,7 @@ func NormalizeAccount(account string) (string, bool, error) {
 		return account, false, nil
 	}
 
-	_, phoneNumber, err := parsePhone(account)
+	_, phoneNumber, err := ParsePhone(account)
 	if err != nil {
 		return "", false, errorx.ERR_PHONE_NUMBER_INVALID
 	}

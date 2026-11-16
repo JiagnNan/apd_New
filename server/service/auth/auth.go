@@ -9,7 +9,6 @@ import (
 	"github.com/JiagnNan/apd_New/server/dao/auth"
 	model "github.com/JiagnNan/apd_New/server/model/auth"
 	"golang.org/x/net/context"
-	"strconv"
 	"time"
 )
 
@@ -57,10 +56,13 @@ func (s *AuthSvc) ConsumeAuthCode(ctx context.Context, code *model.AuthCode) err
 	return errorx.ERR_PHONE_CODE_INVALID
 }
 
-func (s *AuthSvc) Login(ctx context.Context, userId int64, actionType model.ActionType, loginType model.LoginType) error {
+func (s *AuthSvc) Login(ctx context.Context, userId int64, actionType model.ActionType, loginType model.LoginType, countryCode string) error {
 	var v *model.AuthLogin
 
 	md := mdata.FromContext(ctx)
+	if countryCode == "" {
+		countryCode = "0"
+	}
 
 	v = &model.AuthLogin{
 		UserId:        userId,
@@ -74,7 +76,7 @@ func (s *AuthSvc) Login(ctx context.Context, userId int64, actionType model.Acti
 		LoginType:     uint8(loginType),
 		ActionType:    uint8(actionType),
 		ActionTime:    time.Now().Unix(),
-		CountryCode:   strconv.FormatInt(md.CountryCode, 10),
+		CountryCode:   countryCode,
 		Deleted:       0,
 	}
 	err := s.userDao.Login(ctx, v)

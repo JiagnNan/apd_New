@@ -30,3 +30,7 @@ func (svc *UserSvc) GetUserIdByPhoneOrEmail(ctx context.Context, phoneNumber str
 	}
 	return user, nil
 }
+func (svc *UserSvc) CreateUserInfo(ctx context.Context, phoneNumber, countryCode string, isPhone bool) (*model.UserInfo, error) {
+	// TODO: 写入用户记录时保存 countryCode。
+	return nil, errorx.ERR_SERVER_INTERNAL
+}

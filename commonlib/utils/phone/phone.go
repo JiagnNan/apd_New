@@ -8,7 +8,7 @@ import (
 // ErrPhoneNumberInvalid 表示手机号格式或国家码无法识别。
 var ErrPhoneNumberInvalid = errors.New("phone number invalid")
 
-func parsePhone(phoneNumber string) (*Country, string, error) {
+func ParsePhone(phoneNumber string) (*Country, string, error) {
 	phoneNumber = Normalize(phoneNumber)
 	if !IsAllDigits(phoneNumber) {
 		return nil, "", ErrPhoneNumberInvalid

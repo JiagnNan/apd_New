@@ -11,7 +11,7 @@ type UserInfo struct {
 	Gender      uint8     `gorm:"column:gender;"`
 	Nickname    string    `gorm:"column:nickname;"`
 	Username    string    `gorm:"column:username;"`
-	CountryCode int       `gorm:"column:country_code;"`
+	CountryCode string    `gorm:"column:country_code;"`
 	IsLogoff    uint8     `gorm:"column:is_logoff;"`
 	IsAuth      uint8     `gorm:"column:is_auth;"`
 	LogoffTime  int64     `gorm:"column:logoff_time;"`
