@@ -15,18 +15,18 @@ func Normalize(phoneNumber string) string {
 }
 
 // 规范化登录账号，邮箱直接返回，手机号解析后返回真实号码。
-func NormalizeAccount(account string) (string, error) {
+func NormalizeAccount(account string) (string, bool, error) {
 	if account == "" {
-		return "", errorx.ERR_PARAM_INVALID
+		return "", false, errorx.ERR_PARAM_INVALID
 	}
 	if strings.Contains(account, "@") {
-		return account, nil
+		return account, false, nil
 	}
 
 	_, phoneNumber, err := parsePhone(account)
 	if err != nil {
-		return "", errorx.ERR_PHONE_NUMBER_INVALID
+		return "", false, errorx.ERR_PHONE_NUMBER_INVALID
 	}
 
-	return phoneNumber, nil
+	return phoneNumber, true, nil
 }

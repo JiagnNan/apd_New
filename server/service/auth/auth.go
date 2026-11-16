@@ -25,7 +25,7 @@ func NewAuthSvc(userDao AuthCodeRepository, sessionDao *auth.SessionDao, jManage
 }
 
 func (s *AuthSvc) CheckPhoneCode(ctx context.Context, phoneNumber, phoneCode string, codeType model.CodeType) (*model.AuthCode, error) {
-	number, err := utils.NormalizeAccount(phoneNumber)
+	number, _, err := utils.NormalizeAccount(phoneNumber)
 	if err != nil {
 		return nil, err
 	}
