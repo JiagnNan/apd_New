@@ -10,4 +10,5 @@ type UserRepository interface {
 	CreateUserInfo(ctx context.Context, v *model.UserInfo) error
 	UpdateUserNickName(ctx context.Context, userId int64, nickname string) error
 	InsertRegisterInfo(ctx context.Context, v *model.RegisterInfo) error
+	CreateRegistration(ctx context.Context, userInfo *model.UserInfo, registerInfo *model.RegisterInfo) error
 }

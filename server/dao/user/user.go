@@ -47,3 +47,15 @@ func (d *UserDao) UpdateUserNickName(ctx context.Context, userId int64, nickname
 func (d *UserDao) InsertRegisterInfo(ctx context.Context, v *model.RegisterInfo) error {
 	return d.DB(ctx).Create(&v).Error
 }
+
+func (d *UserDao) CreateRegistration(ctx context.Context, userInfo *model.UserInfo, registerInfo *model.RegisterInfo) error {
+	return d.DB(ctx).Transaction(func(tx *gorm.DB) error {
+		txDao := NewUserDao(tx)
+
+		if err := txDao.CreateUserInfo(ctx, userInfo); err != nil {
+			return err
+		}
+
+		return txDao.InsertRegisterInfo(ctx, registerInfo)
+	})
+}

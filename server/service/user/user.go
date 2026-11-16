@@ -6,7 +6,6 @@ import (
 	model "github.com/JiagnNan/apd_New/server/model/user"
 	"github.com/JiagnNan/apd_New/server/service/base"
 	"golang.org/x/net/context"
-	"strings"
 	"time"
 )
 
@@ -46,29 +45,17 @@ func (svc *UserSvc) CreateUserInfo(ctx context.Context, phoneNumber, countryCode
 		Birthday:    time.Date(1990, time.January, 1, 0, 0, 0, 0, time.UTC),
 		CountryCode: countryCode,
 	}
+	registerInfo := &model.RegisterInfo{}
 	if isPhone {
+		registerInfo.Phone = phoneNumber
 		user.Phone = phoneNumber
 	} else {
 		user.Email = phoneNumber
+		registerInfo.Email = phoneNumber
 	}
-	err := svc.UserDao.CreateUserInfo(ctx, user)
-	if err != nil {
+	user.Nickname = svc.BaseSvc.MakeRandomUsername(user.Id)
+	if err := svc.UserDao.CreateRegistration(ctx, user, registerInfo); err != nil {
 		return nil, err
 	}
 	return user, nil
-}
-
-func (svc *UserSvc) InsertRegisterInfo(ctx context.Context, phoneNumber string) error {
-	var v *model.RegisterInfo
-	if strings.Contains(phoneNumber, "@") {
-		v.Email = phoneNumber
-	} else {
-		v.Phone = phoneNumber
-	}
-
-	err := svc.UserDao.InsertRegisterInfo(ctx, v)
-	if err != nil {
-		return errorx.ERR_INERT_REGISTER_INFO
-	}
-	return nil
 }

@@ -45,6 +45,12 @@ func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, err
 		}
 		isPhone = true
 	}
+	platform := mdata.FromContext(l.ctx).Platform
+	switch platform {
+	case "web", "android", "ios":
+	default:
+		return nil, errorx.ERR_PARAM_INVALID
+	}
 	checkedCode, err := l.svcCtx.AuthSvc.CheckPhoneCode(l.ctx, phoneNumber, in.Code, modelAuth.CodeTypeRegister)
 	if err != nil {
 		return nil, err
@@ -63,19 +69,7 @@ func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, err
 		return nil, err
 	}
 
-	md := mdata.FromContext(l.ctx)
-	err = l.svcCtx.UserSvc.InsertRegisterInfo(l.ctx, phoneNumber)
-	if err != nil {
-		return nil, err
-	}
-
 	user, err = l.svcCtx.UserSvc.CreateUserInfo(l.ctx, phoneNumber, c.CountryCode, isPhone)
-	if err != nil {
-		return nil, err
-	}
-
-	nickName := l.svcCtx.BaseSvc.MakeRandomUsername(user.Id)
-	err = l.svcCtx.UserSvc.UserDao.UpdateUserNickName(l.ctx, user.Id, nickName)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +86,7 @@ func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, err
 		return nil, err
 	}
 
-	pair, err := l.svcCtx.AuthSvc.CreateSession(l.ctx, user.Id, md.Platform, user.AuthVersion)
+	pair, err := l.svcCtx.AuthSvc.CreateSession(l.ctx, user.Id, platform, user.AuthVersion)
 	if err != nil {
 		l.Errorf("create login session: %v", err)
 		return nil, errorx.ERR_SERVER_INTERNAL
