@@ -33,3 +33,17 @@ func (d *UserDao) GetUserIdByPhoneOrEmail(ctx context.Context, phoneNumber strin
 
 	return &v, err
 }
+func (d *UserDao) CreateUserInfo(ctx context.Context, v *model.UserInfo) error {
+	return d.DB(ctx).Create(&v).Error
+}
+
+func (d *UserDao) UpdateUserNickName(ctx context.Context, userId int64, nickname string) error {
+	return d.DB(ctx).
+		Table("user_info").
+		Where("id = ?", userId).
+		Update("nickname", nickname).Error
+}
+
+func (d *UserDao) InsertRegisterInfo(ctx context.Context, v *model.RegisterInfo) error {
+	return d.DB(ctx).Create(&v).Error
+}

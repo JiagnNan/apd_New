@@ -1,6 +1,6 @@
 create table user_info(
     id bigint primary key auto_increment,
-    code varchar(255) comment 'user_code',
+    code bigint comment 'user_code',
     birthday date comment '出生年月',
     gender tinyint unsigned DEFAULT 0 COMMENT '性别:0-未知,1-男,2-女',
     nickname varchar(255) DEFAULT '' COMMENT '昵称',
@@ -26,15 +26,13 @@ ADD UNIQUE INDEX uk_user_active_email ((CASE WHEN is_logoff = 0 THEN email ELSE 
 
 create table register_info(
     id bigint primary key auto_increment comment '自增id',
-    user_id bigint not null default 0 comment '用户id',
     phone varchar(255) default null comment '手机号',
     email varchar(255) default null comment '邮箱',
     status tinyint unsigned default 0 comment '注册状态 0正常,1封禁,2删除',
     created_at timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP on update current_timestamp COMMENT '更新时间',
     unique key `udx_phone` (phone),
-    unique key `udx_email` (email),
-    UNIQUE KEY `udx_user_id` (`user_id`)
+    unique key `udx_email` (email)
 )default char set = `utf8mb4` comment '注册信息表';
 
 create table auth_code(

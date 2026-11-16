@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"github.com/JiagnNan/apd_New/commonlib/mdata"
 	modelAuth "github.com/JiagnNan/apd_New/server/model/auth"
 	"strings"
@@ -38,19 +39,19 @@ func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, err
 		phoneNumber = in.Number
 		isPhone = false
 	} else {
-		c, phoneNumber, err = utils.ParsePhone(phoneNumber)
+		c, phoneNumber, err = utils.ParsePhone(in.Number)
 		if err != nil {
 			return nil, errorx.ERR_PARAM_INVALID
 		}
 		isPhone = true
 	}
-	checkedCode, err := l.svcCtx.AuthSvc.CheckPhoneCode(l.ctx, phoneNumber, in.Code, modelAuth.CodeTypeLogin)
+	checkedCode, err := l.svcCtx.AuthSvc.CheckPhoneCode(l.ctx, phoneNumber, in.Code, modelAuth.CodeTypeRegister)
 	if err != nil {
 		return nil, err
 	}
 
 	user, err := l.svcCtx.UserSvc.GetUserIdByPhoneOrEmail(l.ctx, phoneNumber)
-	if err != nil {
+	if err != nil && !errors.Is(err, errorx.ERR_USER_NOT_EXISTED) {
 		return nil, err
 	}
 
@@ -63,11 +64,22 @@ func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, err
 	}
 
 	md := mdata.FromContext(l.ctx)
+	err = l.svcCtx.UserSvc.InsertRegisterInfo(l.ctx, phoneNumber)
+	if err != nil {
+		return nil, err
+	}
 
 	user, err = l.svcCtx.UserSvc.CreateUserInfo(l.ctx, phoneNumber, c.CountryCode, isPhone)
 	if err != nil {
 		return nil, err
 	}
+
+	nickName := l.svcCtx.BaseSvc.MakeRandomUsername(user.Id)
+	err = l.svcCtx.UserSvc.UserDao.UpdateUserNickName(l.ctx, user.Id, nickName)
+	if err != nil {
+		return nil, err
+	}
+
 	var t modelAuth.LoginType
 	if !isPhone {
 		t = modelAuth.EmailLoginType

@@ -67,6 +67,7 @@ var (
 	ERR_CREATE_LOGIN_ERROR        = NewRpcError(http.StatusBadRequest, 100040, "CREATE_LOGIN_ERROR")
 	ERR_DELETED_PHONE_CODE_FAILED = NewRpcError(http.StatusBadRequest, 100050, "DELETE_PHONE_CODE_FAILED")
 	ERR_DUPLICATE_REGISTERATION   = NewRpcError(http.StatusBadRequest, 100060, "DUPLICATE_REGISTERATION")
+	ERR_INERT_REGISTER_INFO       = NewRpcError(http.StatusBadRequest, 100070, "INERT_REGISTER_INFO")
 )
 
 // 联系人错误使用 200xxx 码段。

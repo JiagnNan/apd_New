@@ -9,6 +9,7 @@ import (
 	user2 "github.com/JiagnNan/apd_New/server/dao/user"
 	"github.com/JiagnNan/apd_New/server/rpc/auth/internal/config"
 	"github.com/JiagnNan/apd_New/server/service/auth"
+	"github.com/JiagnNan/apd_New/server/service/base"
 	"github.com/JiagnNan/apd_New/server/service/im"
 	"github.com/JiagnNan/apd_New/server/service/user"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -23,6 +24,7 @@ type ServiceContext struct {
 	Redis      *redisx.Client
 	AuthSvc    *auth.AuthSvc
 	UserSvc    *user.UserSvc
+	BaseSvc    *base.BaseSvc
 	IM         *im.Service
 	IMSessions *auth2.SessionDao
 	IMTokens   *jwt.Manager
@@ -51,8 +53,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	sessionDao := auth2.NewSessionDao(redisClient)
 	authSvc := auth.NewAuthSvc(authDao, sessionDao, manager)
 
+	baseSvc := base.NewBaseSvc(redisClient)
+
 	userDao := user2.NewUserDao(db)
-	userSvc := user.NewUserSvc(userDao)
+	userSvc := user.NewUserSvc(userDao, baseSvc)
 
 	return &ServiceContext{
 		Config:     c,
@@ -60,6 +64,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Redis:      redisClient,
 		AuthSvc:    authSvc,
 		UserSvc:    userSvc,
+		BaseSvc:    baseSvc,
 		IM:         imService,
 		IMSessions: sessionDao,
 		IMTokens:   manager,

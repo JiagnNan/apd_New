@@ -4,16 +4,21 @@ import (
 	"github.com/JiagnNan/apd_New/commonlib/dbx"
 	"github.com/JiagnNan/apd_New/commonlib/errorx"
 	model "github.com/JiagnNan/apd_New/server/model/user"
+	"github.com/JiagnNan/apd_New/server/service/base"
 	"golang.org/x/net/context"
+	"strings"
+	"time"
 )
 
 type UserSvc struct {
 	UserDao UserRepository
+	BaseSvc *base.BaseSvc
 }
 
-func NewUserSvc(userRepository UserRepository) *UserSvc {
+func NewUserSvc(userRepository UserRepository, baseSvc *base.BaseSvc) *UserSvc {
 	return &UserSvc{
 		UserDao: userRepository,
+		BaseSvc: baseSvc,
 	}
 }
 
@@ -31,6 +36,39 @@ func (svc *UserSvc) GetUserIdByPhoneOrEmail(ctx context.Context, phoneNumber str
 	return user, nil
 }
 func (svc *UserSvc) CreateUserInfo(ctx context.Context, phoneNumber, countryCode string, isPhone bool) (*model.UserInfo, error) {
-	// TODO: 写入用户记录时保存 countryCode。
-	return nil, errorx.ERR_SERVER_INTERNAL
+	//默认初始化字段
+	//随机code,自增id
+	id, _ := svc.BaseSvc.NextUserId(ctx)
+	code, _ := svc.BaseSvc.UserCode(ctx)
+	user := &model.UserInfo{
+		Id:          id,
+		Code:        code,
+		Birthday:    time.Date(1990, time.January, 1, 0, 0, 0, 0, time.UTC),
+		CountryCode: countryCode,
+	}
+	if isPhone {
+		user.Phone = phoneNumber
+	} else {
+		user.Email = phoneNumber
+	}
+	err := svc.UserDao.CreateUserInfo(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (svc *UserSvc) InsertRegisterInfo(ctx context.Context, phoneNumber string) error {
+	var v *model.RegisterInfo
+	if strings.Contains(phoneNumber, "@") {
+		v.Email = phoneNumber
+	} else {
+		v.Phone = phoneNumber
+	}
+
+	err := svc.UserDao.InsertRegisterInfo(ctx, v)
+	if err != nil {
+		return errorx.ERR_INERT_REGISTER_INFO
+	}
+	return nil
 }

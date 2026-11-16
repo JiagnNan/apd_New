@@ -4,7 +4,7 @@ import "time"
 
 type UserInfo struct {
 	Id          int64     `gorm:"column:id;primaryKey;autoIncrement"`
-	Code        string    `gorm:"column:code;"`
+	Code        int64     `gorm:"column:code;"`
 	Phone       string    `gorm:"column:phone;"`
 	Email       string    `gorm:"column:email;"`
 	Birthday    time.Time `gorm:"column:birthday;"`
@@ -27,7 +27,6 @@ func (UserInfo) TableName() string {
 
 type RegisterInfo struct {
 	Id     int64  `gorm:"column:id;primaryKey;autoIncrement"`
-	UserId int64  `gorm:"column:user_id;"`
 	Phone  string `gorm:"column:phone;"`
 	Email  string `gorm:"column:email;"`
 	Status uint8  `gorm:"column:status;"`
