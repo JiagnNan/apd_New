@@ -38,7 +38,10 @@ func (svc *UserSvc) CreateUserInfo(ctx context.Context, phoneNumber, countryCode
 	//默认初始化字段
 	//随机code,自增id
 	id, _ := svc.BaseSvc.NextUserId(ctx)
-	code, _ := svc.BaseSvc.UserCode(ctx)
+	code, err := svc.BaseSvc.UserCode(ctx)
+	if err != nil {
+		return nil, err
+	}
 	user := &model.UserInfo{
 		Id:          id,
 		Code:        code,
