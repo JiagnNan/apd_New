@@ -91,6 +91,7 @@ func buildUserCodes(cursor int64, limit int) []int64 {
 		if !ok {
 			break
 		}
+		//将limit范围内符合条件的code放入codes
 		codes = append(codes, next)
 		cursor = next
 	}

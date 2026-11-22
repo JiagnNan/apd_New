@@ -59,3 +59,8 @@ func (d *UserDao) CreateRegistration(ctx context.Context, userInfo *model.UserIn
 		return txDao.InsertRegisterInfo(ctx, registerInfo)
 	})
 }
+func (d *UserDao) GetMaxUserCode(ctx context.Context) (int64, error) {
+	var maxUserCode int64
+	err := d.DB(ctx).Table("user_info").Select("COALESCE(MAX(code),0)").Row().Scan(&maxUserCode)
+	return maxUserCode, err
+}

@@ -2,6 +2,7 @@ package base
 
 import (
 	"fmt"
+	"github.com/JiagnNan/apd_New/commonlib/utils/convert"
 	"strconv"
 
 	"github.com/JiagnNan/apd_New/commonlib/errorx"
@@ -10,9 +11,10 @@ import (
 )
 
 const (
-	userCodeKey               = "auth:user_code:available"
-	userCodeCursorKey         = "auth:user_code:cursor"
-	userCodePublishBatchLimit = 500
+	userCodeKey                     = "auth:user_code:available"
+	userCodeCursorKey               = "auth:user_code:cursor"
+	userCodePublishBatchLimit       = 500
+	targetStock               int64 = 10_000
 )
 
 func (b *BaseSvc) NextUserId(ctx context.Context) (int64, error) {
@@ -70,4 +72,54 @@ return 1
 	default:
 		return false, fmt.Errorf("unexpected user code publish status %d", status)
 	}
+}
+
+// 号码池补库存
+func (b *BaseSvc) SupplementUserCodes(ctx context.Context) error {
+	var cursor int64
+	lLen, err := b.redisClient.LLen(ctx, userCodeKey)
+	if err != nil {
+		return err
+	}
+	if lLen >= 2000 {
+		return nil
+	}
+	expectedCursor, err := b.redisClient.Get(ctx, userCodeCursorKey)
+
+	switch {
+	case err == nil:
+		cursor, err = convert.ParseInt64(expectedCursor)
+	case redisx.IsNil(err):
+		if lLen > 0 {
+			return nil
+		}
+		expectedCursor = ""
+		cursor, err = b.userDao.GetMaxUserCode(ctx)
+		if err == nil && cursor == 0 {
+			cursor = minUserCode
+		}
+	}
+	if err != nil {
+		return err
+	}
+	for lLen < targetStock {
+		limit := int(min(targetStock-lLen, userCodePublishBatchLimit))
+		codes := buildUserCodes(cursor, limit)
+		if len(codes) == 0 {
+			return nil
+		}
+
+		published, err := b.publishUserCodes(ctx, expectedCursor, codes)
+		if err != nil {
+			return err
+		}
+		if !published {
+			break
+		}
+		lLen += int64(len(codes))
+		cursor = codes[len(codes)-1]
+		expectedCursor = strconv.FormatInt(cursor, 10)
+	}
+
+	return nil
 }

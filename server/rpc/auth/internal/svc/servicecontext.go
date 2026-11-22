@@ -53,9 +53,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	sessionDao := auth2.NewSessionDao(redisClient)
 	authSvc := auth.NewAuthSvc(authDao, sessionDao, manager)
 
-	baseSvc := base.NewBaseSvc(redisClient)
-
 	userDao := user2.NewUserDao(db)
+
+	baseSvc := base.NewBaseSvc(redisClient, userDao)
 	userSvc := user.NewUserSvc(userDao, baseSvc)
 
 	return &ServiceContext{
