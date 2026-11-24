@@ -20,8 +20,7 @@ func TestTokenPair(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	const authVersion = "3"
-	pair, err := m.GenerateTokenPair(42, sid, "web", authVersion)
+	pair, err := m.GenerateTokenPair(42, sid, "web")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,7 +33,7 @@ func TestTokenPair(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, claims := range []*Claims{access, refresh} {
-		if claims.UserID != 42 || claims.SessionID != sid || claims.Platform != "web" || claims.AuthVersion != authVersion {
+		if claims.UserID != 42 || claims.SessionID != sid || claims.Platform != "web" {
 			t.Fatalf("unexpected identity: %+v", claims)
 		}
 	}
@@ -49,11 +48,8 @@ func TestTokenPair(t *testing.T) {
 	if _, err := m.ParseRefreshToken(pair.AccessToken); err == nil {
 		t.Error("accepted access token as refresh token")
 	}
-	if _, err := m.GenerateTokenPair(42, sid, "desktop", authVersion); err == nil {
+	if _, err := m.GenerateTokenPair(42, sid, "desktop"); err == nil {
 		t.Error("accepted unsupported platform")
-	}
-	if _, err := m.GenerateTokenPair(42, sid, "web", ""); err == nil {
-		t.Error("accepted empty auth version")
 	}
 
 	expired := *access
@@ -61,8 +57,6 @@ func TestTokenPair(t *testing.T) {
 	expired.ExpiresAt = jwtlib.NewNumericDate(time.Now().Add(-time.Hour))
 	noExpiry := *access
 	noExpiry.ExpiresAt = nil
-	noAuthVersion := *access
-	noAuthVersion.AuthVersion = ""
 	wrongType := *access
 	wrongType.TokenType = string(refreshToken)
 	for _, tc := range []struct {
@@ -73,7 +67,6 @@ func TestTokenPair(t *testing.T) {
 	}{
 		{"expired", jwtlib.SigningMethodHS256, expired, m.accessKey},
 		{"missing expiration", jwtlib.SigningMethodHS256, noExpiry, m.accessKey},
-		{"empty auth version", jwtlib.SigningMethodHS256, noAuthVersion, m.accessKey},
 		{"wrong type with valid signature", jwtlib.SigningMethodHS256, wrongType, m.accessKey},
 		{"wrong signature", jwtlib.SigningMethodHS256, *access, m.refreshKey},
 		{"wrong algorithm", jwtlib.SigningMethodHS384, *access, m.accessKey},

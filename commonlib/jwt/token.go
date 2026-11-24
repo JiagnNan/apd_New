@@ -18,11 +18,10 @@ const (
 )
 
 type Claims struct {
-	UserID      int64  `json:"uid"`
-	SessionID   string `json:"sid"`
-	Platform    string `json:"platform"`
-	TokenType   string `json:"tokenType"`
-	AuthVersion string `json:"authVersion"`
+	UserID    int64  `json:"uid"`
+	SessionID string `json:"sid"`
+	Platform  string `json:"platform"`
+	TokenType string `json:"tokenType"`
 	jwtlib.RegisteredClaims
 }
 
@@ -79,12 +78,11 @@ func randomID() (string, error) {
 	return hex.EncodeToString(id[:]), nil
 }
 
-func (m *Manager) GenerateTokenPair(userID int64, sessionID, platform string, authVersion string) (TokenPair, error) {
+func (m *Manager) GenerateTokenPair(userID int64, sessionID, platform string) (TokenPair, error) {
 	identity := Claims{
-		UserID:      userID,
-		SessionID:   sessionID,
-		Platform:    platform,
-		AuthVersion: authVersion,
+		UserID:    userID,
+		SessionID: sessionID,
+		Platform:  platform,
 	}
 	if !identity.validIdentity() {
 		return TokenPair{}, errors.New("invalid JWT session identity")
@@ -146,7 +144,7 @@ func parse(raw string, kind tokenType, secret []byte) (*Claims, error) {
 func (c Claims) validIdentity() bool {
 	switch c.Platform {
 	case "web", "android", "ios":
-		return c.UserID > 0 && c.SessionID != "" && c.AuthVersion != ""
+		return c.UserID > 0 && c.SessionID != ""
 	default:
 		return false
 	}
