@@ -24,11 +24,15 @@ func (b *BaseSvc) NextUserId(ctx context.Context) (int64, error) {
 
 func (b *BaseSvc) UserCode(ctx context.Context) (int64, error) {
 	pop, err := b.redisClient.LPop(ctx, userCodeKey)
-	num, _ := strconv.ParseInt(pop, 10, 64)
+
 	if err != nil {
 		if redisx.IsNil(err) {
 			return 0, errorx.ERR_TOO_MANY_REQUESTS
 		}
+		return 0, err
+	}
+	num, err := strconv.ParseInt(pop, 10, 64)
+	if err != nil {
 		return 0, err
 	}
 	return num, nil

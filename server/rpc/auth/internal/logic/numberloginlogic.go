@@ -48,10 +48,6 @@ func (l *NumberLoginLogic) NumberLogin(in *authpb.NumberLoginReq) (*authpb.Token
 	default:
 		return nil, errorx.ERR_PARAM_INVALID
 	}
-	if user.AuthVersion == "" {
-		l.Errorf("missing auth version for user %d", user.Id)
-		return nil, errorx.ERR_SERVER_INTERNAL
-	}
 	var t modelAuth.LoginType
 	if !isPhone {
 		t = modelAuth.EmailLoginType
@@ -68,7 +64,7 @@ func (l *NumberLoginLogic) NumberLogin(in *authpb.NumberLoginReq) (*authpb.Token
 		return nil, err
 	}
 
-	pair, err := l.svcCtx.AuthSvc.CreateSession(l.ctx, user.Id, platform, user.AuthVersion)
+	pair, err := l.svcCtx.AuthSvc.CreateSession(l.ctx, user.Id, platform)
 	if err != nil {
 		l.Errorf("create login session: %v", err)
 		return nil, errorx.ERR_SERVER_INTERNAL

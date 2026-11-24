@@ -55,12 +55,12 @@ func (s *RefreshImUserSigLogic) RefreshImUserSig(_ *authpb.ImUserSigReq) (*authp
 		logx.WithContext(ctx).Errorf("refresh IM UserSig: stage=session_lookup user_id=%d err=%v", claims.UserID, err)
 		return nil, status.Error(codes.Unavailable, "session check unavailable")
 	}
-	if session.SessionId != claims.SessionID || session.AuthVersion != claims.AuthVersion ||
+	if session.SessionId != claims.SessionID ||
 		subtle.ConstantTimeCompare([]byte(session.AccessHash), []byte(jwt.TokenHash(raw))) != 1 {
 		return nil, status.Error(codes.Unauthenticated, "invalid session")
 	}
 	var user usermodel.UserInfo
-	err = s.svcCtx.DB.WithContext(ctx).Select("id", "auth_version", "is_logoff", "black_time").
+	err = s.svcCtx.DB.WithContext(ctx).Select("id", "is_logoff", "black_time").
 		Where("id = ?", claims.UserID).Take(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, status.Error(codes.Unauthenticated, "invalid account")
@@ -69,7 +69,7 @@ func (s *RefreshImUserSigLogic) RefreshImUserSig(_ *authpb.ImUserSigReq) (*authp
 		logx.WithContext(ctx).Errorf("refresh IM UserSig: stage=account_lookup user_id=%d err=%v", claims.UserID, err)
 		return nil, status.Error(codes.Unavailable, "account check unavailable")
 	}
-	if user.IsLogoff != 0 || user.BlackTime != 0 || user.AuthVersion != claims.AuthVersion {
+	if user.IsLogoff != 0 || user.BlackTime != 0 {
 		return nil, status.Error(codes.Unauthenticated, "invalid account session")
 	}
 	info, err := s.svcCtx.IM.IssueUserSig(ctx, user.Id)

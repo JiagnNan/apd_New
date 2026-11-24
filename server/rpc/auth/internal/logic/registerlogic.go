@@ -34,16 +34,18 @@ func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, err
 	var phoneNumber string
 	var isPhone bool
 	var err error
-	var c *utils.Country
+	countryCode := "84"
 	if strings.Contains(in.Number, "@") {
 		phoneNumber = in.Number
 		isPhone = false
 	} else {
+		var c *utils.Country
 		c, phoneNumber, err = utils.ParsePhone(in.Number)
 		if err != nil {
 			return nil, errorx.ERR_PARAM_INVALID
 		}
 		isPhone = true
+		countryCode = c.CountryCode
 	}
 	platform := mdata.FromContext(l.ctx).Platform
 	switch platform {
@@ -69,7 +71,7 @@ func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, err
 		return nil, err
 	}
 
-	user, err = l.svcCtx.UserSvc.CreateUserInfo(l.ctx, phoneNumber, c.CountryCode, isPhone)
+	user, err = l.svcCtx.UserSvc.CreateUserInfo(l.ctx, phoneNumber, countryCode, isPhone)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +88,7 @@ func (l *RegisterLogic) Register(in *authpb.RegisterReq) (*authpb.TokenResp, err
 		return nil, err
 	}
 
-	pair, err := l.svcCtx.AuthSvc.CreateSession(l.ctx, user.Id, platform, user.AuthVersion)
+	pair, err := l.svcCtx.AuthSvc.CreateSession(l.ctx, user.Id, platform)
 	if err != nil {
 		l.Errorf("create login session: %v", err)
 		return nil, errorx.ERR_SERVER_INTERNAL

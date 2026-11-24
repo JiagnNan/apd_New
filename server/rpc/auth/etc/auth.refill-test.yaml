@@ -1,0 +1,35 @@
+Name: auth.rpc
+# Tencent IM configuration. Supply APD_IM_SECRET_KEY through the environment.
+# IM:
+#   Enabled: true
+#   SDKAppID: 0
+#   AdminUser: administrator
+#   Region: cn
+ListenOn: 127.0.0.1:18080
+
+MysqlConf:
+  DataSource: root:root@tcp(127.0.0.1:3306)/apd?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+  DSN: ""
+  MaxIdleConn: 10
+  MaxOpenConn: 100
+  MaxLifetime: 600
+  SlowThreshold: 200
+
+RedisConf:
+  Addr: 127.0.0.1:16381
+  DB: 1
+
+AuthKey:
+  AccessSecret: "local-refill-test-access-only-0001"
+  AccessExpire: 3600
+  RefreshSecret: "local-refill-test-access-only-0002"
+  RefreshExpire: 7200
+
+PhoneCode:
+  Expire: 600
+  ResendInterval: 60
+
+AppLog:
+  level: "debug"
+  encoding: "console"
+  stacktrace: "false"

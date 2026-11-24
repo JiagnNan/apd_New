@@ -7,12 +7,12 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *AuthSvc) CreateSession(ctx context.Context, userId int64, platform, authVersion string) (*jwt.TokenPair, error) {
+func (s *AuthSvc) CreateSession(ctx context.Context, userId int64, platform string) (*jwt.TokenPair, error) {
 	sessionId, err := jwt.NewSessionID()
 	if err != nil {
 		return nil, errorx.ERR_SERVER_INTERNAL
 	}
-	pair, err := s.jManager.GenerateTokenPair(userId, sessionId, platform, authVersion)
+	pair, err := s.jManager.GenerateTokenPair(userId, sessionId, platform)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,6 @@ func (s *AuthSvc) CreateSession(ctx context.Context, userId int64, platform, aut
 		SessionId:       sessionId,
 		AccessHash:      jwt.TokenHash(pair.AccessToken),
 		RefreshHash:     jwt.TokenHash(pair.RefreshToken),
-		AuthVersion:     authVersion,
 		RefreshExpireAt: pair.RefreshExpireAt.Unix(),
 	}
 	err = s.sessionDao.SaveSession(ctx, userId, platform, session)

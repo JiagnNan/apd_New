@@ -37,7 +37,10 @@ func (svc *UserSvc) GetUserIdByPhoneOrEmail(ctx context.Context, phoneNumber str
 func (svc *UserSvc) CreateUserInfo(ctx context.Context, phoneNumber, countryCode string, isPhone bool) (*model.UserInfo, error) {
 	//默认初始化字段
 	//随机code,自增id
-	id, _ := svc.BaseSvc.NextUserId(ctx)
+	id, err := svc.BaseSvc.NextUserId(ctx)
+	if err != nil {
+		return nil, errorx.ERR_SERVER_INTERNAL
+	}
 	code, err := svc.BaseSvc.UserCode(ctx)
 	if err != nil {
 		return nil, err
@@ -50,11 +53,11 @@ func (svc *UserSvc) CreateUserInfo(ctx context.Context, phoneNumber, countryCode
 	}
 	registerInfo := &model.RegisterInfo{}
 	if isPhone {
-		registerInfo.Phone = phoneNumber
-		user.Phone = phoneNumber
+		registerInfo.Phone = &phoneNumber
+		user.Phone = &phoneNumber
 	} else {
-		user.Email = phoneNumber
-		registerInfo.Email = phoneNumber
+		user.Email = &phoneNumber
+		registerInfo.Email = &phoneNumber
 	}
 	user.Nickname = svc.BaseSvc.MakeRandomUsername(user.Id)
 	if err := svc.UserDao.CreateRegistration(ctx, user, registerInfo); err != nil {

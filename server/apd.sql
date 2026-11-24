@@ -6,7 +6,7 @@ create table user_info(
     nickname varchar(255) DEFAULT '' COMMENT '昵称',
     username varchar(255) DEFAULT null COMMENT 'username',
     country_code varchar(16) DEFAULT '84' COMMENT '国家码',
-    is_logoff tinyint unsigned DEFAULT 0 COMMENT '是否注销:0-未注销,1-已注销',
+    is_logoff tinyint unsigned NOT NULL DEFAULT 0 COMMENT '是否注销:0-未注销,1-已注销',
     is_auth tinyint unsigned DEFAULT 0 COMMENT '是否认证:0-未认证,1-已认证',
     logoff_time bigint null default 0 COMMENT '注销时间',
     black_time bigint null default 0 COMMENT '平台拉黑/封禁时间',
@@ -22,17 +22,19 @@ ALTER TABLE user_info
 ADD COLUMN phone varchar(20)  DEFAULT NULL,
 add column email varchar(128) default null,
 ADD UNIQUE INDEX uk_user_active_phone ((CASE WHEN is_logoff = 0 THEN phone ELSE NULL END)),
-ADD UNIQUE INDEX uk_user_active_email ((CASE WHEN is_logoff = 0 THEN email ELSE NULL END));
+ADD UNIQUE INDEX uk_user_active_email ((CASE WHEN is_logoff = 0 THEN email ELSE NULL END)),
+ADD INDEX idx_user_phone_logoff (phone, is_logoff),
+ADD INDEX idx_user_email_logoff (email, is_logoff);
 
 create table register_info(
     id bigint primary key auto_increment comment '自增id',
     phone varchar(255) default null comment '手机号',
     email varchar(255) default null comment '邮箱',
-    status tinyint unsigned default 0 comment '注册状态 0正常,1封禁,2删除',
+    status tinyint unsigned not null default 0 comment '注册状态 0正常,1封禁,2删除',
     created_at timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP on update current_timestamp COMMENT '更新时间',
-    unique key `udx_phone` (phone),
-    unique key `udx_email` (email)
+    unique key `uk_register_active_phone` ((CASE WHEN status <> 2 THEN phone ELSE NULL END)),
+    unique key `uk_register_active_email` ((CASE WHEN status <> 2 THEN email ELSE NULL END))
 )default char set = `utf8mb4` comment '注册信息表';
 
 create table auth_code(
