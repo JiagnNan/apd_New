@@ -23,7 +23,6 @@ type Session struct {
 	SessionId       string `json:"sid"`
 	AccessHash      string `json:"accessHash"`
 	RefreshHash     string `json:"refreshHash"`
-	AuthVersion     string `json:"authVersion"`
 	RefreshExpireAt int64  `json:"refreshExpireAt"`
 	DeviceId        string `json:"deviceId,optional"`
 }
