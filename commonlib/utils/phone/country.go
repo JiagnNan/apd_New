@@ -21,8 +21,20 @@ var countryList []Country
 
 var countryMap = make(map[string]Country)
 
+var dialCodeByISO2 = make(map[string]string)
+
+var conflictingISO2 = make(map[string]bool)
+
 func GetCountry(countryCode string) (Country, bool) {
 	v, ok := countryMap[countryCode]
+	return v, ok
+}
+func GetDialCodeByISO2(iso2 string) (string, bool) {
+	iso2 = strings.ToUpper(strings.TrimSpace(iso2))
+	if conflictingISO2[iso2] {
+		return "", false
+	}
+	v, ok := dialCodeByISO2[iso2]
 	return v, ok
 }
 
@@ -63,5 +75,16 @@ func init() {
 		//双容器存储
 		countryList = append(countryList, c)
 		countryMap[c.CountryCode] = c
+
+		iso2 := strings.ToUpper(strings.TrimSpace(c.ISO2))
+		dialCode := strings.TrimSpace(c.CountryCode)
+		if iso2 == "" || dialCode == "" || conflictingISO2[iso2] {
+			continue
+		}
+		if previous, ok := dialCodeByISO2[iso2]; ok && previous != dialCode {
+			conflictingISO2[iso2] = true
+			continue
+		}
+		dialCodeByISO2[iso2] = dialCode
 	}
 }
